@@ -101,14 +101,11 @@ namespace Celezt.BehaviourTree.GameObject
 
         private void SetupParent()
         {
-            if (_parent == null)
-            {
-                Transform parent = transform.parent;
-                if (parent != null)
-                    _isRoot = !parent.TryGetComponent(out _parent);
-                else
-                    _isRoot = true;
-            }
+            Transform parent = transform.parent;
+            if (parent != null)
+                _isRoot = !parent.TryGetComponent(out _parent);
+            else
+                _isRoot = true;
         }
 
         private void SetupChildren()
@@ -117,7 +114,7 @@ namespace Celezt.BehaviourTree.GameObject
             foreach (Transform child in transform)
             {
                 if (child.TryGetComponent(out NodeBehaviour node))
-                    if (node.isActiveAndEnabled)
+                    if (node.enabled)
                         _children.Add(node);
             }
         }
@@ -143,7 +140,7 @@ namespace Celezt.BehaviourTree.GameObject
 
             for (int i = 0; i < _children.Count; i++)
             {
-                if (_children[i].isActiveAndEnabled)
+                if (_children[i].enabled)
                     _children[i].SetupRecursiveCreate();
             }
         }
@@ -187,7 +184,7 @@ namespace Celezt.BehaviourTree.GameObject
         private NodeBehaviour Next(NodeBehaviour nextNode)
         {
             INodeAsset data = nextNode.ProcessNode(nextNode._children, nextNode._parent);
-            _status = data.Status;
+            nextNode._status = data.Status;
 
             return data.Process(nextNode);
         }

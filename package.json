@@ -5,7 +5,7 @@
   "description": "Wide range of utilities created to be reused in Unity",
   "unity": "2020.3",
   "dependencies": {
-    "com.unity.mathematics": "1.2.1",
+    "com.unity.mathematics": "1.2.2",
     "com.domybest.mybox": "1.7.0"
  },
  "keywords": [

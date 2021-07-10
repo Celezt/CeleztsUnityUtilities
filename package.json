@@ -1,11 +1,11 @@
 {
   "name": "com.celezt.cuu",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "Celezt's Unity Utilities",
   "description": "Wide range of utilities created to be reused in Unity",
   "unity": "2020.3",
   "dependencies": {
-    "com.unity.mathematics": "1.2.2",
+    "com.unity.mathematics": "1.2.1",
     "com.domybest.mybox": "1.7.0"
  },
  "keywords": [

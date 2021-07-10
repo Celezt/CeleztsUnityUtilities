@@ -31,6 +31,9 @@ namespace Celezt.BehaviourTree.GameObject
 
         private NodeStatus _status;
 
+        private bool _isStarted;
+        private bool _isCreated;
+
         [SerializeField, HideInInspector] private bool _isRoot;
 
         private enum UpdateType
@@ -53,20 +56,16 @@ namespace Celezt.BehaviourTree.GameObject
         private void Awake()
         {
             SetupParent();
-
-            _children = new List<NodeBehaviour>();
-            foreach (Transform child in transform)
-            {
-                if (child.TryGetComponent(out NodeBehaviour node))
-                    _children.Add(node);
-            }
+            SetupChildren();
         }
 
         private void Start()
         {
+            _isStarted = true;
+
             if (_parent == null)
             {
-                SetupCreate();
+                SetupRecursiveCreate();
 
                 if (_updateBT == null)
                     _updateBT = StartCoroutine(UpdateBT());
@@ -75,13 +74,27 @@ namespace Celezt.BehaviourTree.GameObject
 
         private void OnEnable()
         {
+            if (_isStarted)
+            {
+                if (_parent != null)
+                    _parent.SetupChildren();
+
+                if (!_isCreated)
+                    SetupCreate();
+            }
+
             if (_parent == null && _root != null)
+            {
                 if (_updateBT == null)
                     _updateBT = StartCoroutine(UpdateBT());
+            }
         }
 
         private void OnDisable()
         {
+            if (_parent != null)
+                _parent._children.Remove(this);
+
             StopCoroutine(UpdateBT());
             _updateBT = null;
         }
@@ -98,6 +111,17 @@ namespace Celezt.BehaviourTree.GameObject
             }
         }
 
+        private void SetupChildren()
+        {
+            _children = new List<NodeBehaviour>();
+            foreach (Transform child in transform)
+            {
+                if (child.TryGetComponent(out NodeBehaviour node))
+                    if (node.isActiveAndEnabled)
+                        _children.Add(node);
+            }
+        }
+
         private void SetupCreate()
         {
             if (_parent == null && _root == null)
@@ -109,11 +133,18 @@ namespace Celezt.BehaviourTree.GameObject
                 _nodes.AddRange(_children);
             }
 
+            _isCreated = true;
             CreateNode(_children, _parent);
+        }
+
+        private void SetupRecursiveCreate()
+        {
+            SetupCreate();
 
             for (int i = 0; i < _children.Count; i++)
             {
-                _children[i].SetupCreate();
+                if (_children[i].isActiveAndEnabled)
+                    _children[i].SetupRecursiveCreate();
             }
         }
 
